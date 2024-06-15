@@ -30,10 +30,15 @@ class DownloadedFile:
 
 
 class ResultFileDownloadManager:
-    def __init__(self, max_download_threads: int, lz4_compressed: bool):
+    def __init__(
+        self, max_download_threads: int, lz4_compressed: bool, timeout_seconds: int
+    ):
         self.download_handlers: List[ResultSetDownloadHandler] = []
         self.thread_pool = ThreadPoolExecutor(max_workers=max_download_threads + 1)
-        self.downloadable_result_settings = DownloadableResultSettings(lz4_compressed)
+        self.downloadable_result_settings = DownloadableResultSettings(
+            is_lz4_compressed=lz4_compressed,
+            download_timeout=timeout_seconds,
+        )
         self.fetch_need_retry = False
         self.num_consecutive_result_file_download_retries = 0
 

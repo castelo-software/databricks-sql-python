@@ -161,6 +161,7 @@ class ThriftBackend:
 
         # Cloud fetch
         self.max_download_threads = kwargs.get("max_download_threads", 10)
+        self.download_timeout_seconds = kwargs.get("download_timeout_seconds", 60)
 
         # Configure tls context
         ssl_context = create_default_context(cafile=kwargs.get("_tls_trusted_ca_file"))
@@ -772,6 +773,7 @@ class ThriftBackend:
                 t_row_set=direct_results.resultSet.results,
                 arrow_schema_bytes=schema_bytes,
                 max_download_threads=self.max_download_threads,
+                timeout_seconds=self.download_timeout_seconds,
                 lz4_compressed=lz4_compressed,
                 description=description,
             )
@@ -1003,6 +1005,7 @@ class ThriftBackend:
             t_row_set=resp.results,
             arrow_schema_bytes=arrow_schema_bytes,
             max_download_threads=self.max_download_threads,
+            timeout_seconds=self.download_timeout_seconds,
             lz4_compressed=lz4_compressed,
             description=description,
         )

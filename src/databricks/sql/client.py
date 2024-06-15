@@ -196,6 +196,13 @@ class Connection:
         # (True by default)
         # use_cloud_fetch
         # Enable use of cloud fetch to extract large query results in parallel via cloud storage
+        # (True by default)
+        # max_download_threads
+        # Maximum number of threads that may run in parallel to perform cloud fetch downloads
+        # (10 by default)
+        # download_timeout_seconds
+        # Configure the timeout of each download operation performed by cloud fetch
+        # (60 by default)
 
         if access_token:
             access_token_kv = {"access_token": access_token}

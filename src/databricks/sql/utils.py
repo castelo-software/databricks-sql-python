@@ -47,6 +47,7 @@ class ResultSetQueueFactory(ABC):
         t_row_set: TRowSet,
         arrow_schema_bytes: bytes,
         max_download_threads: int,
+        timeout_seconds: int,
         lz4_compressed: bool = True,
         description: List[List[Any]] = None,
     ) -> ResultSetQueue:
@@ -57,9 +58,10 @@ class ResultSetQueueFactory(ABC):
             row_set_type (enum): Row set type (Arrow, Column, or URL).
             t_row_set (TRowSet): Result containing arrow batches, columns, or cloud fetch links.
             arrow_schema_bytes (bytes): Bytes representing the arrow schema.
+            max_download_threads (int): Maximum number of downloader thread pool threads.
+            timeout_seconds (int): Timeout for the cloud fetch download in seconds.
             lz4_compressed (bool): Whether result data has been lz4 compressed.
             description (List[List[Any]]): Hive table schema description.
-            max_download_threads (int): Maximum number of downloader thread pool threads.
 
         Returns:
             ResultSetQueue
@@ -88,6 +90,7 @@ class ResultSetQueueFactory(ABC):
                 lz4_compressed=lz4_compressed,
                 description=description,
                 max_download_threads=max_download_threads,
+                timeout_seconds=timeout_seconds,
             )
         else:
             raise AssertionError("Row set type is not valid")
@@ -133,6 +136,7 @@ class CloudFetchQueue(ResultSetQueue):
         self,
         schema_bytes,
         max_download_threads: int,
+        timeout_seconds: int,
         start_row_offset: int = 0,
         result_links: List[TSparkArrowResultLink] = None,
         lz4_compressed: bool = True,
@@ -144,6 +148,7 @@ class CloudFetchQueue(ResultSetQueue):
         Attributes:
             schema_bytes (bytes): Table schema in bytes.
             max_download_threads (int): Maximum number of downloader thread pool threads.
+            timeout_seconds (int): Timeout for the cloud fetch download in seconds.
             start_row_offset (int): The offset of the first row of the cloud fetch links.
             result_links (List[TSparkArrowResultLink]): Links containing the downloadable URL and metadata.
             lz4_compressed (bool): Whether the files are lz4 compressed.
@@ -151,6 +156,7 @@ class CloudFetchQueue(ResultSetQueue):
         """
         self.schema_bytes = schema_bytes
         self.max_download_threads = max_download_threads
+        self.timeout_seconds = timeout_seconds
         self.start_row_index = start_row_offset
         self.result_links = result_links
         self.lz4_compressed = lz4_compressed
@@ -170,7 +176,7 @@ class CloudFetchQueue(ResultSetQueue):
                 )
 
         self.download_manager = ResultFileDownloadManager(
-            self.max_download_threads, self.lz4_compressed
+            self.max_download_threads, self.lz4_compressed, self.timeout_seconds
         )
         self.download_manager.add_file_links(result_links)
 

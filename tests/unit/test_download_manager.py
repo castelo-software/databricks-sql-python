@@ -14,7 +14,8 @@ class DownloadManagerTests(unittest.TestCase):
     def create_download_manager(self):
         max_download_threads = 10
         lz4_compressed = True
-        return download_manager.ResultFileDownloadManager(max_download_threads, lz4_compressed)
+        timeout = 60
+        return download_manager.ResultFileDownloadManager(max_download_threads, lz4_compressed, timeout)
 
     def create_result_link(
             self,
